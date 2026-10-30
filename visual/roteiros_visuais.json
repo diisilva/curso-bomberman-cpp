@@ -1,0 +1,1201 @@
+{
+ "1": {
+  "titulo": "Tipos, funções e referências",
+  "tipo": "fluxo",
+  "contexto": "No jogo: moverJogador escolhe a célula; avancarVisual desliza o sprite até ela.",
+  "etapas": [
+   {
+    "item": "Posicao{1,1}",
+    "conta": "struct Posicao { int linha, coluna; };",
+    "resultado": "jogador = (1,1)",
+    "porque": "Duas variáveis que sempre andam juntas viram um tipo só."
+   },
+   {
+    "item": "moverErrado(cópia)",
+    "conta": "moverErrado(jogador, 0, 1)",
+    "resultado": "jogador continua (1,1)",
+    "porque": "Sem &, a função alterou uma cópia que sumiu ao terminar."
+   },
+   {
+    "item": "mover(&)",
+    "conta": "mover(jogador, 0, 1)",
+    "resultado": "jogador = (1,2)",
+    "porque": "Com &, alvo é outro nome para o jogador de main."
+   },
+   {
+    "item": "avancarVisual",
+    "conta": "3,6 células/s × 0,1 s = 0,36 célula",
+    "resultado": "visual = (1; 1,36)",
+    "porque": "A célula lógica já é (1,2); o desenho chega lá aos poucos."
+   }
+  ]
+ },
+ "2": {
+  "titulo": "Matriz, enum e mapa",
+  "tipo": "grade",
+  "contexto": "No jogo: criarMapa monta a arena 13 × 15; limparArea abre espaço para quem nasce.",
+  "etapas": [
+   {
+    "item": "borda + pilares",
+    "conta": "borda: l==0, l==12, c==0, c==14; pilar: l%2==0 && c%2==0",
+    "resultado": "30 pilares + a moldura de #",
+    "porque": "mapa[l][c]: o 1º índice é a linha (desce), o 2º é a coluna (vai à direita).",
+    "foco": [
+     2,
+     2
+    ],
+    "mapa": [
+     "###############",
+     "#.............#",
+     "#.#.#.#.#.#.#.#",
+     "#.............#",
+     "#.#.#.#.#.#.#.#",
+     "#.............#",
+     "#.#.#.#.#.#.#.#",
+     "#.............#",
+     "#.#.#.#.#.#.#.#",
+     "#.............#",
+     "#.#.#.#.#.#.#.#",
+     "#.............#",
+     "###############"
+    ]
+   },
+   {
+    "item": "sorteio de caixas (36%)",
+    "conta": "chance(gerador) < 36 em cada uma das 113 casas livres",
+    "resultado": "43 caixas (+) com a semente 2026",
+    "porque": "PAREDE_FRAGIL é um valor do enum, não um número mágico.",
+    "foco": [
+     1,
+     1
+    ],
+    "mapa": [
+     "###############",
+     "#+.....+..+..+#",
+     "#.#.#+#.#+#.#.#",
+     "#+...+...+....#",
+     "#+#.#+#.#+#.#+#",
+     "#++++++..+...+#",
+     "#.#+#.#.#+#.#.#",
+     "#.......++....#",
+     "#.#.#+#+#.#.#+#",
+     "#.++.+.+.++++.#",
+     "#+#.#+#.#.#+#.#",
+     "#+...++..++...#",
+     "###############"
+    ]
+   },
+   {
+    "item": "limparArea(1,1) do jogo",
+    "conta": "mapa[0][1] = VAZIO; mapa[1][0] = VAZIO",
+    "resultado": "buracos na borda: borda intacta = 0",
+    "porque": "O jogo real abre as quatro vizinhas sem olhar se são parede.",
+    "foco": [
+     0,
+     1
+    ],
+    "mapa": [
+     "#.#############",
+     ".S.....+..+..+#",
+     "#.#.#+#.#+#.#.#",
+     "#+...+...+....#",
+     "#+#.#+#.#+#.#+#",
+     "#++++++..+...+#",
+     "#.#+#.#.#+#.#.#",
+     "#.......++....#",
+     "#.#.#+#+#.#.#+#",
+     "#.++.+.+.++++.#",
+     "#+#.#+#.#.#+#.#",
+     "#+...++..++...#",
+     "###############"
+    ]
+   },
+   {
+    "item": "limparArea corrigida",
+    "conta": "só abre a vizinha se for PAREDE_FRAGIL",
+    "resultado": "borda intacta = 1",
+    "porque": "Exercício 2: a correção está em solucoes/.",
+    "foco": [
+     0,
+     1
+    ],
+    "mapa": [
+     "###############",
+     "#S.....+..+..+#",
+     "#.#.#+#.#+#.#.#",
+     "#+...+...+....#",
+     "#+#.#+#.#+#.#+#",
+     "#++++++..+...+#",
+     "#.#+#.#.#+#.#.#",
+     "#.......++....#",
+     "#.#.#+#+#.#.#+#",
+     "#.++.+.+.++++.#",
+     "#+#.#+#.#.#+#.#",
+     "#+...++..++...#",
+     "###############"
+    ]
+   }
+  ]
+ },
+ "3": {
+  "titulo": "Janela e mensagens Win32",
+  "tipo": "fluxo",
+  "contexto": "No jogo: WinMain cria a janela; processarMensagem trata timer, teclado, pintura e fim.",
+  "etapas": [
+   {
+    "item": "RegisterClassW",
+    "conta": "classe.lpfnWndProc = processarMensagem",
+    "resultado": "o Windows sabe quem chamar",
+    "porque": "A classe liga cada janela dela a uma função de mensagens."
+   },
+   {
+    "item": "CreateWindowExW",
+    "conta": "AdjustWindowRect(área útil) → CreateWindowExW",
+    "resultado": "HWND: a janela existe",
+    "porque": "AdjustWindowRect soma bordas e título ao tamanho útil pedido."
+   },
+   {
+    "item": "laço GetMessage",
+    "conta": "while (GetMessageW(...) > 0) DispatchMessageW",
+    "resultado": "cada evento → processarMensagem",
+    "porque": "O programa passa quase toda a vida esperando neste laço."
+   },
+   {
+    "item": "WM_DESTROY",
+    "conta": "KillTimer; PostQuitMessage(0)",
+    "resultado": "GetMessage devolve 0: fim",
+    "porque": "Sem PostQuitMessage a janela some, mas o processo fica vivo."
+   }
+  ]
+ },
+ "4": {
+  "titulo": "Formas, cores e GDI+",
+  "tipo": "fluxo",
+  "contexto": "No jogo: desenharMenu é feito de painel, desenharTexto e imagens, sobre fundoInterface.",
+  "etapas": [
+   {
+    "item": "InvalidateRect",
+    "conta": "InvalidateRect(janela, nullptr, FALSE)",
+    "resultado": "WM_PAINT agendado",
+    "porque": "Ninguém pinta na hora: o programa pede e o Windows avisa quando pintar."
+   },
+   {
+    "item": "BeginPaint → HDC",
+    "conta": "HDC dc = BeginPaint(janela, &pintura)",
+    "resultado": "superfície da janela",
+    "porque": "O HDC é o destino dos pixels; Graphics g(dc) desenha nele."
+   },
+   {
+    "item": "Graphics + pincel",
+    "conta": "SolidBrush(Color(105, 0, 0, 0)) → FillEllipse",
+    "resultado": "sombra 41% opaca",
+    "porque": "Alfa 105 de 255: a cor se mistura com o chão que já estava lá."
+   },
+   {
+    "item": "EndPaint",
+    "conta": "Graphics destruído → EndPaint(janela, &pintura)",
+    "resultado": "quadro entregue",
+    "porque": "Sem EndPaint, a área continua \"suja\" e o WM_PAINT se repete."
+   }
+  ]
+ },
+ "6": {
+  "titulo": "Tempo, entrada e animação",
+  "tipo": "barras",
+  "valores": [
+   2,
+   7,
+   9,
+   21
+  ],
+  "contexto": "No jogo: WM_TIMER mede o tempo real e chama atualizar(8) quantas vezes couber.",
+  "etapas": [
+   {
+    "item": "chega 16 ms",
+    "conta": "acumulado = 0 + 16 = 16  →  16 / 8 = 2 passos",
+    "resultado": "total = 2, resto = 0",
+    "porque": "Cada atualizar(8) consome exatamente 8 ms de simulação."
+   },
+   {
+    "item": "chega 40 ms",
+    "conta": "acumulado = 0 + 40 = 40  →  5 passos",
+    "resultado": "total = 7, resto = 0",
+    "porque": "Um tick atrasado não perde tempo: roda mais passos de uma vez."
+   },
+   {
+    "item": "chega 16 ms",
+    "conta": "acumulado = 0 + 16  →  2 passos",
+    "resultado": "total = 9, resto = 0",
+    "porque": "A soma dos ms recebidos vira sempre a mesma simulação."
+   },
+   {
+    "item": "chega 250 ms",
+    "conta": "min(250, 100) = 100  →  12 passos, sobram 4 ms",
+    "resultado": "total = 21, resto = 4",
+    "porque": "O teto de 100 ms evita uma avalanche de passos depois de uma pausa."
+   }
+  ]
+ },
+ "7": {
+  "titulo": "Movimento e colisão",
+  "tipo": "grade",
+  "contexto": "No jogo: moverJogador reserva a casa na hora; avancarVisual leva o desenho até ela.",
+  "etapas": [
+   {
+    "item": "direita: reserva (1,2)",
+    "conta": "podeAndarPara((1,2)) → '.' livre",
+    "resultado": "lógica = (1,2), visual = (1; 1,00)",
+    "porque": "A casa fica reservada antes de o sprite sair do lugar.",
+    "foco": [
+     1,
+     2
+    ],
+    "mapa": [
+     "#####",
+     "#So.#",
+     "#.#.#",
+     "#...#",
+     "#####"
+    ]
+   },
+   {
+    "item": "80 ms: baixo é ignorado",
+    "conta": "visualNoDestino = falso; tempoMovimentoMs = 200",
+    "resultado": "visual = (1; 1,29), sem curva",
+    "porque": "Curvas só no centro da casa: nada de cortar quina.",
+    "foco": [
+     1,
+     2
+    ],
+    "mapa": [
+     "#####",
+     "#So.#",
+     "#.#.#",
+     "#...#",
+     "#####"
+    ]
+   },
+   {
+    "item": "280 ms: chegou",
+    "conta": "3,6 células/s × 0,28 s = 1,008 ≥ 1",
+    "resultado": "visual = (1; 2,00), chegou = 1",
+    "porque": "O cooldown de 280 ms termina junto com a chegada.",
+    "foco": [
+     1,
+     2
+    ],
+    "mapa": [
+     "#####",
+     "#.S.#",
+     "#.#.#",
+     "#...#",
+     "#####"
+    ]
+   },
+   {
+    "item": "baixo: pilar em (2,2)",
+    "conta": "mapa[2][2] = '#' → podeAndarPara falso",
+    "resultado": "recusado: lógica continua (1,2)",
+    "porque": "Passo recusado não gasta cooldown: outra direção pode tentar já.",
+    "foco": [
+     2,
+     2
+    ],
+    "mapa": [
+     "#####",
+     "#.S.#",
+     "#.#.#",
+     "#...#",
+     "#####"
+    ]
+   }
+  ]
+ },
+ "8": {
+  "titulo": "Bomba e explosão recursiva",
+  "tipo": "grade",
+  "contexto": "No jogo: propagarExplosao é chamada 4 vezes; cada chamada avança uma casa e chama a si mesma.",
+  "etapas": [
+   {
+    "item": "t=0: colocarBombaEm (2,1)",
+    "conta": "nova.tempoMs = TEMPO_BOMBA_MS = 2200",
+    "resultado": "fusível armado: 275 atualizações",
+    "porque": "atualizarBombas desconta 8 ms por passo até chegar a zero.",
+    "foco": [
+     2,
+     1
+    ],
+    "mapa": [
+     "#######",
+     "#.....#",
+     "#B++..#",
+     "#.....#",
+     "#######"
+    ]
+   },
+   {
+    "item": "t=2200: direita, 1ª casa",
+    "conta": "propagar(0,+1, alcance 3): (2,2) é caixa",
+    "resultado": "caixa vira chão; segue com alcance 2",
+    "porque": "Caixa não é caso base: a chama quebra e continua.",
+    "foco": [
+     2,
+     2
+    ],
+    "mapa": [
+     "#######",
+     "#.....#",
+     "#B*+..#",
+     "#.....#",
+     "#######"
+    ]
+   },
+   {
+    "item": "direita, 2ª e 3ª casas",
+    "conta": "(2,3) caixa → alcance 1; (2,4) chão → alcance 0",
+    "resultado": "alcance 0: caso base, para",
+    "porque": "Cada chamada recebe alcanceRestante - 1: a recursão sempre termina.",
+    "foco": [
+     2,
+     4
+    ],
+    "mapa": [
+     "#######",
+     "#.....#",
+     "#B***.#",
+     "#.....#",
+     "#######"
+    ]
+   },
+   {
+    "item": "cima, baixo e esquerda",
+    "conta": "(1,1) e (3,1) chão; (2,0) é '#': caso base",
+    "resultado": "6 células com chama; 2 caixas",
+    "porque": "Parede sólida para a chama sem entrar na lista de células.",
+    "foco": [
+     2,
+     0
+    ],
+    "mapa": [
+     "#######",
+     "#*....#",
+     "#B***.#",
+     "#*....#",
+     "#######"
+    ]
+   }
+  ]
+ },
+ "9": {
+  "titulo": "Os oito poderes",
+  "tipo": "fluxo",
+  "itens": true,
+  "contexto": "No jogo: posicionarBlocosBonus esconde 8 itens; a chama revela; pisar coleta; montarFase zera.",
+  "etapas": [
+   {
+    "item": "escondido no bloco",
+    "conta": "blocosBonus = {(1,2) RAIO, (1,3) BOMBA_EXTRA, ...}",
+    "resultado": "pisar em (1,2) não dá nada",
+    "porque": "Enquanto o bloco existe, o item só está no vetor blocosBonus."
+   },
+   {
+    "item": "chama revela",
+    "conta": "destruirBlocoBonus(1,2) → itensNoChao.push_back",
+    "resultado": "2 itens no chão, 1 escondido",
+    "porque": "O item muda de vetor: de escondido para visível."
+   },
+   {
+    "item": "pisa e coleta",
+    "conta": "switch (tipo): RAIO → alcance++; BOMBA_EXTRA → extras++",
+    "resultado": "alcance = 2, limite = 2, +60 pontos",
+    "porque": "Cada case altera só a variável do seu poder; RAIO tem teto 5."
+   },
+   {
+    "item": "nova fase",
+    "conta": "montarFase: alcance = 1; bombasExtras = 0; ...",
+    "resultado": "alcance = 1, limite = 1, vidas = 4",
+    "porque": "Poderes são da fase e zeram; vidas são da partida e ficam."
+   }
+  ]
+ },
+ "10": {
+  "titulo": "Fila e busca em largura",
+  "tipo": "grade",
+  "contexto": "No jogo: a mesma bfsProximoPasso guia inimigos, chefe e bot; só mudam as duas lambdas.",
+  "etapas": [
+   {
+    "item": "origem entra na fila",
+    "conta": "fila = {(1,1)}; visitado[1][1] = true",
+    "resultado": "distância 0",
+    "porque": "A busca começa no inimigo (S) e procura o jogador (F).",
+    "foco": [
+     1,
+     1
+    ],
+    "mapa": [
+     "#######",
+     "#S.#.F#",
+     "#..#..#",
+     "#.....#",
+     "#######"
+    ]
+   },
+   {
+    "item": "ondas de distância 1 e 2",
+    "conta": "sai (1,1) → entram (2,1) e (1,2); depois (2,2), (3,1)",
+    "resultado": "perto é visitado antes de longe",
+    "porque": "FIFO: quem entrou primeiro sai primeiro, então a busca anda em ondas.",
+    "foco": [
+     2,
+     1
+    ],
+    "mapa": [
+     "#######",
+     "#So#.F#",
+     "#oo#..#",
+     "#o....#",
+     "#######"
+    ]
+   },
+   {
+    "item": "contorna a parede",
+    "conta": "coluna 3 bloqueada nas linhas 1 e 2",
+    "resultado": "alvo alcançado a 8 passos",
+    "porque": "anterior[][] guarda de onde cada casa foi descoberta.",
+    "foco": [
+     3,
+     3
+    ],
+    "mapa": [
+     "#######",
+     "#So#oF#",
+     "#oo#oo#",
+     "#ooooo#",
+     "#######"
+    ]
+   },
+   {
+    "item": "volta pelo anterior",
+    "conta": "(1,5) ← (1,4) ← (2,4) ← (3,4) ← ... ← (2,1)",
+    "resultado": "primeiro passo = (2,1)",
+    "porque": "O jogo só usa o 1º passo: na próxima decisão, recalcula tudo.",
+    "foco": [
+     2,
+     1
+    ],
+    "mapa": [
+     "#######",
+     "#S.#oF#",
+     "#o.#o.#",
+     "#oooo.#",
+     "#######"
+    ]
+   }
+  ]
+ },
+ "11": {
+  "titulo": "Perigo e fuga do bot",
+  "tipo": "grade",
+  "contexto": "No jogo: o bot usa celulaNoAlcance para prever a chama; a chama real é propagarExplosao.",
+  "etapas": [
+   {
+    "item": "bomba e duas caixas",
+    "conta": "bomba (1,1), alcance 4, caixas em (1,2) e (1,3)",
+    "resultado": "pergunta: (1,4) é seguro?",
+    "porque": "Antes de fugir, o bot precisa saber onde a chama vai chegar.",
+    "foco": [
+     1,
+     4
+    ],
+    "mapa": [
+     "#######",
+     "#B++..#",
+     "#######"
+    ]
+   },
+   {
+    "item": "previsão para na 1ª caixa",
+    "conta": "i = 1 é caixa → return i == distancia (1 == 3)",
+    "resultado": "prevista = 0: \"seguro\"",
+    "porque": "celulaNoAlcance trata caixa como fim da chama.",
+    "foco": [
+     1,
+     2
+    ],
+    "mapa": [
+     "#######",
+     "#B++..#",
+     "#######"
+    ]
+   },
+   {
+    "item": "chama real atravessa",
+    "conta": "propagarExplosao: caixa quebra e a recursão continua",
+    "resultado": "real = 1: (1,4) pega fogo",
+    "porque": "Mesma pergunta, duas regras: o bot pode fugir para dentro da chama.",
+    "foco": [
+     1,
+     4
+    ],
+    "mapa": [
+     "#######",
+     "#B****#",
+     "#######"
+    ]
+   },
+   {
+    "item": "previsão corrigida",
+    "conta": "só PAREDE_SOLIDA interrompe a previsão",
+    "resultado": "2925 comparações, 0 divergências",
+    "porque": "Exercício 2: uma regra só, testada em todas as casas.",
+    "foco": [
+     1,
+     4
+    ],
+    "mapa": [
+     "#######",
+     "#B****#",
+     "#######"
+    ]
+   }
+  ]
+ },
+ "12": {
+  "titulo": "Fases, dificuldade e dois jogadores",
+  "tipo": "fluxo",
+  "contexto": "No jogo: três funções trocam de fase, e cada uma preserva coisas diferentes.",
+  "etapas": [
+   {
+    "item": "novaPartida",
+    "conta": "pontos = 0; vidas = 3; estatisticas = {}; montarFase()",
+    "resultado": "fase 1, tudo zerado",
+    "porque": "Só novaPartida zera pontos e estatísticas da partida."
+   },
+   {
+    "item": "morreu: reiniciar",
+    "conta": "vidas-- (em atualizar) → reiniciarFase() → montarFase()",
+    "resultado": "vidas 2; pontos e movFase ficam",
+    "porque": "Repetir a fase custa uma vida e os bônus da fase."
+   },
+   {
+    "item": "entrou no portal",
+    "conta": "max(0, 500 - 70 - 5 × 10) = 380",
+    "resultado": "+380 pontos de bônus",
+    "porque": "Eficiência: cada passo custa 1 e cada bomba 5, somando as tentativas."
+   },
+   {
+    "item": "avancarFase",
+    "conta": "fase++; vidas = 3; movFase = bombasFase = 0",
+    "resultado": "fase 2, vidas 3, 680 pontos",
+    "porque": "Vidas voltam à base: uma VIDA_EXTRA não passa de fase."
+   }
+  ]
+ },
+ "13": {
+  "titulo": "Ranking em CSV",
+  "tipo": "fluxo",
+  "contexto": "No jogo: ranking.csv fica ao lado do .exe; a tela 6 do menu lê, ordena e mostra.",
+  "etapas": [
+   {
+    "item": "5 campos por linha",
+    "conta": "data;jogador;pontos;bombas;movimentos",
+    "resultado": "14/10/2026;Bia;900;3;35",
+    "porque": "CSV é texto puro: dá para abrir no Bloco de Notas e conferir."
+   },
+   {
+    "item": "1º critério: pontos",
+    "conta": "Davi, Bia e Ana: 900 > Caio: 700",
+    "resultado": "Caio fica em último",
+    "porque": "Mais pontos vence; o resto só desempata."
+   },
+   {
+    "item": "bombas e passos",
+    "conta": "Davi 2 bombas < 3; Bia 35 passos < Ana 40",
+    "resultado": "Davi, Bia, Ana",
+    "porque": "Menos bombas e menos passos: jogar com eficiência conta."
+   },
+   {
+    "item": "gravar e reler",
+    "conta": "ofstream << ...; getline(partes, campo, ';')",
+    "resultado": "1. Davi  2. Bia  3. Ana  4. Caio",
+    "porque": "Ler de volta o que foi gravado é o teste mais simples de um formato."
+   }
+  ]
+ },
+ "14": {
+  "titulo": "Chefes, projéteis e Mario",
+  "tipo": "fluxo",
+  "contexto": "No jogo: fases pares têm chefe; bombas tiram 4 de vida e o chefe responde com projéteis.",
+  "etapas": [
+   {
+    "item": "vida do chefe",
+    "conta": "round(48 × 1,15) = 55",
+    "resultado": "Golem começa com 55",
+    "porque": "FATOR_FORCA_BOSS ajusta os cinco chefes de uma vez."
+   },
+   {
+    "item": "bomba acerta",
+    "conta": "vida = max(0, 55 - 4); imunidadeMs = 700",
+    "resultado": "vida = 51",
+    "porque": "Depois de um acerto, o chefe fica 0,7 s imune."
+   },
+   {
+    "item": "mesma chama de novo",
+    "conta": "b.bossAtingido == true → return",
+    "resultado": "vida continua 51",
+    "porque": "A chama dura 650 ms: sem a trava, uma bomba acertaria 81 vezes."
+   },
+   {
+    "item": "subpassos de 25 ms",
+    "conta": "12 células/s × 0,025 s = 0,3 célula por teste",
+    "resultado": "acerta em c = 3,10",
+    "porque": "Sem subpassos, um quadro de 250 ms pula 3 células de uma vez."
+   }
+  ]
+ },
+ "15": {
+  "titulo": "Áudio: amostras PCM",
+  "tipo": "fluxo",
+  "contexto": "No jogo: gerarMusicaProcedural calcula a música inteira; não há arquivo de áudio.",
+  "etapas": [
+   {
+    "item": "amostragem",
+    "conta": "11025 amostras/s × 0,17 s por nota",
+    "resultado": "1874 amostras por nota",
+    "porque": "Som digital é uma lista de números medidos muitas vezes por segundo."
+   },
+   {
+    "item": "onda quadrada",
+    "conta": "fmod(t × 392, 1) < 0,5 ? +1 : −1",
+    "resultado": "alto/baixo a cada ~14 amostras",
+    "porque": "A frequência decide quão rápido a onda alterna: isso é a nota."
+   },
+   {
+    "item": "envelope",
+    "conta": "1 − 0,4 × i / 1874",
+    "resultado": "volume cai de 100% para 60%",
+    "porque": "O fade no fim da nota evita o estalo na troca de nota."
+   },
+   {
+    "item": "8 bits sem sinal",
+    "conta": "128 + onda × envelope × 40",
+    "resultado": "14992 bytes = 1,36 s",
+    "porque": "Silêncio é 128; 168 e 88 são os picos da onda."
+   }
+  ]
+ },
+ "16": {
+  "titulo": "Controle e camada de entrada",
+  "tipo": "fluxo",
+  "contexto": "No jogo: SDL2, XInput e DirectInput viram uma só EntradaControle antes de chegar às regras.",
+  "etapas": [
+   {
+    "item": "XINPUT_GAMEPAD",
+    "conta": "wButtons = DPAD_UP | A; sThumbLX = 0",
+    "resultado": "bits de botões + eixos −32768..32767",
+    "porque": "Cada API entrega o controle num formato diferente."
+   },
+   {
+    "item": "direcional primeiro",
+    "conta": "if (cima) dl = −1; else ... else analógico",
+    "resultado": "dl = −1: cima vence",
+    "porque": "O direcional é preciso; o analógico só vale se ele estiver solto."
+   },
+   {
+    "item": "zona morta",
+    "conta": "|5000| < 10500 → parado; (15000, 20000) → eixo Y",
+    "resultado": "sem tremida, sem diagonal",
+    "porque": "Analógico parado nunca marca zero exato; o jogo tem grade de 4 direções."
+   },
+   {
+    "item": "EntradaControle",
+    "conta": "A ou B → bomba; X chute; Y teleporte; ombros detonar",
+    "resultado": "{dl, dc, bomba, ...}",
+    "porque": "As regras leem intenções, não botões de um aparelho."
+   }
+  ]
+ },
+ "17": {
+  "titulo": "Leitura guiada do jogo real",
+  "tipo": "fluxo",
+  "contexto": "No jogo: 4450 linhas e 242 funções; quatro mensagens organizam tudo.",
+  "etapas": [
+   {
+    "item": "WinMain",
+    "conta": "DPI → GDI+ → RegisterClassW → CreateWindowExW → laço",
+    "resultado": "janela criada; o jogo espera",
+    "porque": "Comece pelo fim do arquivo: é onde o programa começa."
+   },
+   {
+    "item": "WM_TIMER",
+    "conta": "tempo real → atualizar(8) × n → InvalidateRect",
+    "resultado": "o estado avança em passos de 8 ms",
+    "porque": "atualizar chama 25 funções: é o índice das regras."
+   },
+   {
+    "item": "WM_PAINT",
+    "conta": "desenhar: buffer → menu ou partida → BitBlt",
+    "resultado": "um quadro completo na tela",
+    "porque": "O desenho só lê o estado; nunca decide regra."
+   },
+   {
+    "item": "WM_DESTROY",
+    "conta": "KillTimer → pararMusica → encerrarControle → liberarAssets",
+    "resultado": "recursos liberados em ordem",
+    "porque": "Quem cria cada recurso também sabe quando liberá-lo."
+   }
+  ]
+ },
+ "18": {
+  "titulo": "Animação direcional real",
+  "tipo": "fluxo",
+  "contexto": "No jogo: linhaDaFolhaParaDirecao escolhe a linha; quadroCaminhada escolhe a coluna da folha.",
+  "etapas": [
+   {
+    "item": "direção → linha",
+    "conta": "baixo 0, direita 1, cima 2, esquerda 3",
+    "resultado": "uma linha da folha por direção",
+    "porque": "A direção não depende do quadro atual da caminhada."
+   },
+   {
+    "item": "tabela de Rect",
+    "conta": "Rect x[d][p], y = 38, altura = 26 (Aula 05)",
+    "resultado": "recorte irregular medido",
+    "porque": "A folha desta aula não é uma grade regular de quadro × 16."
+   },
+   {
+    "item": "ciclo {0,1,0,2}",
+    "conta": "pose = ciclo[int(distância × 4) % 4]",
+    "resultado": "pose troca a cada 0,25 célula",
+    "porque": "A pose segue a distância andada: parado, volta à pose neutra."
+   },
+   {
+    "item": "DrawImage",
+    "conta": "origem = Rect da folha; destino = célula ampliada",
+    "resultado": "sprite ampliado, sem o fundo roxo",
+    "porque": "SetColorKey(112,0,170) apaga só a cor de fundo do recorte."
+   }
+  ]
+ },
+ "19": {
+  "titulo": "Motor completo dos poderes",
+  "tipo": "grade",
+  "contexto": "No jogo: E chuta, T teleporta, F detona; imunidade e travessia mudam as regras de dano e de passagem.",
+  "etapas": [
+   {
+    "item": "bomba à frente",
+    "conta": "esperado = jogador + direcaoJogador = (1,2)",
+    "resultado": "há bomba: o chute vale",
+    "porque": "O chute só procura a bomba na casa para onde o jogador olha.",
+    "foco": [
+     1,
+     2
+    ],
+    "mapa": [
+     "#########",
+     "#SB.....#",
+     "#.#.#.#.#",
+     "#....+..#",
+     "#########"
+    ]
+   },
+   {
+    "item": "chute: até 4 casas",
+    "conta": "(1,3), (1,4), (1,5), (1,6) livres; ALCANCE_CHUTE = 4",
+    "resultado": "bomba em (1,6); carta gasta",
+    "porque": "Para antes de parede, caixa ou inimigo; nunca passa por cima.",
+    "foco": [
+     1,
+     6
+    ],
+    "mapa": [
+     "#########",
+     "#S....B.#",
+     "#.#.#.#.#",
+     "#....+..#",
+     "#########"
+    ]
+   },
+   {
+    "item": "teleporte",
+    "conta": "sorteia entre casas livres, sem inimigo nem bomba",
+    "resultado": "jogador e desenho em (1,2)",
+    "porque": "O desenho salta junto: deslizar cruzaria o mapa inteiro.",
+    "foco": [
+     1,
+     2
+    ],
+    "mapa": [
+     "#########",
+     "#.S...B.#",
+     "#.#.#.#.#",
+     "#....+..#",
+     "#########"
+    ]
+   },
+   {
+    "item": "atravessar caixas",
+    "conta": "atravessa && mapa == PAREDE_FRAGIL",
+    "resultado": "caixa = 1; bloco bônus = 0; parede = 0",
+    "porque": "A carta não deixa pegar itens escondidos andando por dentro.",
+    "foco": [
+     3,
+     5
+    ],
+    "mapa": [
+     "#########",
+     "#.S...B.#",
+     "#.#.#.#.#",
+     "#....+..#",
+     "#########"
+    ]
+   }
+  ]
+ },
+ "20": {
+  "titulo": "BFS de fuga segura",
+  "tipo": "grade",
+  "contexto": "No jogo: o bot só planta se alvoParaBomba E existeFugaSegura forem verdadeiros.",
+  "etapas": [
+   {
+    "item": "vale plantar aqui?",
+    "conta": "alvoParaBomba((1,2)): caixa em (1,1), no alcance",
+    "resultado": "sim: há caixa para quebrar",
+    "porque": "Sem alvo, plantar é desperdício de bomba.",
+    "foco": [
+     1,
+     1
+    ],
+    "mapa": [
+     "#######",
+     "#+S..##",
+     "#######"
+    ]
+   },
+   {
+    "item": "alcance 1: há fuga",
+    "conta": "(1,3) na chama; (1,4) fora dela, a 2 passos",
+    "resultado": "fuga em 2 passos → PLANTA",
+    "porque": "A BFS para na primeira casa onde a previsão diz 'seguro'.",
+    "foco": [
+     1,
+     4
+    ],
+    "mapa": [
+     "#######",
+     "#*B*F##",
+     "#######"
+    ]
+   },
+   {
+    "item": "alcance 2: sem fuga",
+    "conta": "(1,3) e (1,4) na chama; o corredor acaba",
+    "resultado": "nenhuma casa segura → não planta",
+    "porque": "Plantar ali seria suicídio: o bot espera ou procura outro lugar.",
+    "foco": [
+     1,
+     4
+    ],
+    "mapa": [
+     "#######",
+     "#*B**##",
+     "#######"
+    ]
+   },
+   {
+    "item": "o prazo da fuga",
+    "conta": "2200 ms / 280 ms = 7 passos (com 440 ms: 5)",
+    "resultado": "casa a 6 passos só vale com prazo 7",
+    "porque": "Não basta existir caminho: é preciso chegar antes da explosão.",
+    "foco": [
+     1,
+     4
+    ],
+    "mapa": [
+     "#######",
+     "#*B*F##",
+     "#######"
+    ]
+   }
+  ]
+ },
+ "21": {
+  "titulo": "Ranking CSV completo",
+  "tipo": "fluxo",
+  "contexto": "No jogo: nomes digitados podem ter ; e aspas, e o arquivo pode ter sido editado à mão.",
+  "etapas": [
+   {
+    "item": "campoCsv",
+    "conta": "Ana; \"A\"  →  \"Ana; \"\"A\"\"\"",
+    "resultado": "nome protegido por aspas",
+    "porque": "Dentro de aspas, ; é texto; uma aspa vira duas."
+   },
+   {
+    "item": "lerCamposCsv",
+    "conta": "estado: fora ou dentro de aspas; \"\" → \"",
+    "resultado": "5 campos: Ana; \"A\" volta igual",
+    "porque": "O leitor desfaz exatamente o que o escritor fez."
+   },
+   {
+    "item": "inteiroValido",
+    "conta": "stoi(\"novecentos\") lança; \"-5\" < 0; 4 campos",
+    "resultado": "4 linhas ignoradas, jogo segue",
+    "porque": "Uma linha ruim não pode derrubar o ranking inteiro."
+   },
+   {
+    "item": ".tmp e MoveFileEx",
+    "conta": "grava ranking.csv.tmp → MoveFileExA(REPLACE)",
+    "resultado": "nunca fica pela metade",
+    "porque": "Se faltar disco no meio, o arquivo antigo continua intacto."
+   }
+  ]
+ },
+ "22": {
+  "titulo": "Máquina de estados do chefe",
+  "tipo": "fluxo",
+  "contexto": "No jogo: a Hornet tem 22 etapas (enum EtapaHornet); um switch escolhe a próxima.",
+  "etapas": [
+   {
+    "item": "H_PREP_AGULHA",
+    "conta": "entrarEtapaHornet(H_PREP_AGULHA, 750)",
+    "resultado": "aviso de 750 ms",
+    "porque": "Toda etapa tem duração; a preparação dá tempo de reagir."
+   },
+   {
+    "item": "H_LANCAR + voo",
+    "conta": "tempo = 0 → LANCAR (360) + soltarAgulhaHornet()",
+    "resultado": "agulha no ar",
+    "porque": "Entrar numa etapa pode disparar um efeito, só uma vez."
+   },
+   {
+    "item": "dano no meio",
+    "conta": "reagirDanoHornet → H_DANO (480) → H_RECUP_DANO (420)",
+    "resultado": "volta ao voo: a agulha ainda não voltou",
+    "porque": "A próxima etapa depende do mundo, não só da etapa atual."
+   },
+   {
+    "item": "H_RECOLHER → IDLE",
+    "conta": "agulha voltou → RECOLHER (480) → IDLE",
+    "resultado": "t = 3248: pronta de novo",
+    "porque": "Um enum nomeado evita combinações impossíveis de bools."
+   }
+  ]
+ },
+ "23": {
+  "titulo": "Arquivo WAV completo",
+  "tipo": "fluxo",
+  "contexto": "No jogo: o WAV é montado na memória e entregue ao PlaySoundW, que toca em loop.",
+  "etapas": [
+   {
+    "item": "RIFF / WAVE",
+    "conta": "'RIFF' + tamanhoArquivo + 'WAVE'",
+    "resultado": "tamanhoArquivo = 15036 − 8 = 15028",
+    "porque": "O primeiro bloco diz que tipo de arquivo é e quanto falta ler."
+   },
+   {
+    "item": "bloco fmt",
+    "conta": "formato 1 (PCM), 1 canal, 11025 Hz, 8 bits",
+    "resultado": "bytesPorSegundo = 11025",
+    "porque": "Sem estes números, os bytes seguintes seriam só lixo."
+   },
+   {
+    "item": "bloco data",
+    "conta": "'data' + tamanhoDados (14992) + as amostras",
+    "resultado": "cabeçalho de 44 bytes",
+    "porque": "#pragma pack(1) garante 44 bytes sem enchimento."
+   },
+   {
+    "item": "PlaySoundW",
+    "conta": "SND_MEMORY | SND_ASYNC | SND_LOOP",
+    "resultado": "o buffer precisa viver enquanto toca",
+    "porque": "Por isso bufferMusica é global, e pararMusica vem antes de liberar."
+   }
+  ]
+ },
+ "24": {
+  "titulo": "Backbuffer, escala e DPI",
+  "tipo": "fluxo",
+  "contexto": "No jogo: tudo é desenhado em 1080 × 852 e escalado para a janela e o monitor.",
+  "etapas": [
+   {
+    "item": "WM_SIZE: escala",
+    "conta": "janela 900 × 480: min(900/560, 480/420) = 1,14",
+    "resultado": "escala 1,14; margem x = 130",
+    "porque": "A menor razão cabe nos dois eixos; a sobra vira faixa lateral."
+   },
+   {
+    "item": "garantirBuffer",
+    "conta": "mesmo tamanho? reaproveita; mudou? recria",
+    "resultado": "um bitmap por tamanho de janela",
+    "porque": "Criar um bitmap a cada quadro desperdiça tempo e memória."
+   },
+   {
+    "item": "desenha no buffer",
+    "conta": "Graphics g(bufferDC); Translate(margem); px(...)",
+    "resultado": "quadro pronto, fora da tela",
+    "porque": "px() converte as medidas do jogo para pixels da janela."
+   },
+   {
+    "item": "BitBlt",
+    "conta": "BitBlt(destino, 0, 0, w, h, bufferDC, 0, 0, SRCCOPY)",
+    "resultado": "o quadro chega inteiro",
+    "porque": "A tela nunca mostra meio desenho: acabou o pisca-pisca."
+   }
+  ]
+ },
+ "29": {
+  "titulo": "O C++ que o jogo usa",
+  "tipo": "fluxo",
+  "contexto": "No jogo: struct, enum, vector, lambda, template e unique_ptr aparecem em quase toda função.",
+  "etapas": [
+   {
+    "item": "struct + padrão",
+    "conta": "struct EntradaControle { int dl = 0, dc = 0; bool bomba = false; };",
+    "resultado": "EntradaControle e; → tudo zerado",
+    "porque": "Valores padrão evitam variáveis com lixo de memória."
+   },
+   {
+    "item": "lambda",
+    "conta": "[limite](int v) { return v > limite; }",
+    "resultado": "2 chefes com vida > 100",
+    "porque": "Uma função curta, criada onde é usada, que pode guardar variáveis."
+   },
+   {
+    "item": "template",
+    "conta": "template <typename Criterio> int contarSe(..., Criterio c)",
+    "resultado": "a mesma função aceita qualquer lambda",
+    "porque": "Cada lambda tem um tipo próprio; o template aceita todos."
+   },
+   {
+    "item": "unique_ptr",
+    "conta": "{ auto jogador = carregarSprite(\"jogador.png\"); }",
+    "resultado": "liberou jogador.png ao sair do bloco",
+    "porque": "Quem é dono do recurso o libera sozinho: sem delete esquecido."
+   }
+  ]
+ },
+ "30": {
+  "titulo": "Construindo um menu completo",
+  "tipo": "fluxo",
+  "contexto": "No jogo: onze telas, um campo de texto, mouse e joystick passando pelo mesmo lerTeclado.",
+  "etapas": [
+   {
+    "item": "estado explícito",
+    "conta": "enum TelaMenu telaMenu; TelaMenu telaAposNomes",
+    "resultado": "uma tela por vez; sabe para onde voltar",
+    "porque": "O mesmo campo de nome serve à rota Jogar e ao atalho das fases."
+   },
+   {
+    "item": "WM_CHAR digita",
+    "conta": "TranslateMessage gera WM_CHAR; WM_KEYDOWN move o cursor",
+    "resultado": "\"Joao\" vira \"João\"",
+    "porque": "WM_CHAR já chega com acento e maiúscula resolvidos."
+   },
+   {
+    "item": "mouse com escala",
+    "conta": "x_menu = (x_janela − margemX) / escala",
+    "resultado": "clique certo em qualquer tamanho",
+    "porque": "O desenho é escalado; o clique precisa da conta inversa."
+   },
+   {
+    "item": "joystick = teclado",
+    "conta": "toque em A → lerTeclado(VK_RETURN, 0)",
+    "resultado": "nenhuma regra nova para o controle",
+    "porque": "Uma tela nova funciona no controle sem código extra."
+   }
+  ]
+ },
+ "31": {
+  "titulo": "Conectando um joystick de verdade",
+  "tipo": "fluxo",
+  "contexto": "No jogo: atualizarEstadoControle roda a cada WM_TIMER e escolhe uma das três APIs.",
+  "etapas": [
+   {
+    "item": "SDL2 → XInput → DI",
+    "conta": "SDL2.dll achou controle? senão XInput; senão DirectInput",
+    "resultado": "uma origem por vez",
+    "porque": "Cada API cobre controles que as outras leem mal ou não leem."
+   },
+   {
+    "item": "normalizar",
+    "conta": "eixo 0..65535 → −1000..1000; POV 9000 → direita",
+    "resultado": "todo controle na mesma escala",
+    "porque": "Controles genéricos informam faixas e formatos diferentes."
+   },
+   {
+    "item": "toque (borda)",
+    "conta": "novo(agora, antes) = agora && !antes",
+    "resultado": "segurar A = 1 bomba, não 60",
+    "porque": "Ações de menu e bomba disparam quando o botão desce."
+   },
+   {
+    "item": "foco e reconexão",
+    "conta": "fora de foco → leitura zerada; ao conectar, antes = agora",
+    "resultado": "sem movimento nem bomba fantasma",
+    "porque": "O controle só age na janela do jogo, e só depois de solto."
+   }
+  ]
+ },
+ "32": {
+  "titulo": "A tela de ranking: listar, renomear e excluir",
+  "tipo": "fluxo",
+  "contexto": "No jogo: a opção 6 do menu relê ranking.csv a cada desenho; E renomeia e DEL exclui o nome selecionado.",
+  "etapas": [
+   {
+    "item": "chave do nome",
+    "conta": "chaveNomeRanking(\"  ANA \") == chaveNomeRanking(\"ana\")",
+    "resultado": "a mesma pessoa, um registro só",
+    "porque": "Maiúsculas e espaços extras não podem criar um segundo jogador."
+   },
+   {
+    "item": "Read e página",
+    "conta": "inicio = selecionado / 10 * 10",
+    "resultado": "registro 11 → página 2",
+    "porque": "A página sai da seleção; não existe uma variável \"página\" para ficar errada."
+   },
+   {
+    "item": "Update",
+    "conta": "editarNomeRanking(\"Caio\", \" BIA \") → false",
+    "resultado": "700 pontos preservados; nome repetido recusado",
+    "porque": "Renomear troca só o nome e nunca funde dois jogadores."
+   },
+   {
+    "item": "Delete confirmado",
+    "conta": "DEL → pergunta → S → excluirRegistroRanking",
+    "resultado": "nome livre para recomeçar do zero",
+    "porque": "Apagar é irreversível: a tela pergunta antes e mostra o que se perde."
+   }
+  ]
+ },
+ "33": {
+  "titulo": "Configurando os controles: quem joga com o quê",
+  "tipo": "fluxo",
+  "contexto": "No jogo: JOGAR → quantos vão jogar → nomes → quem usa cada controle → personagens.",
+  "etapas": [
+   {
+    "item": "escolher × medir",
+    "conta": "doisJogadores, dispositivoP1/P2 escolhidos; controleConectado medido",
+    "resultado": "plugar o controle não cria jogador",
+    "porque": "Só a tela de quantidade decide quantos jogam."
+   },
+   {
+    "item": "ladoDispositivo",
+    "conta": "ladoDispositivo: −1 = P1, 0 = SEM USO, 1 = P2",
+    "resultado": "o cartão vai para a coluna certa",
+    "porque": "Três colunas viram um número; o desenho só lê esse número."
+   },
+   {
+    "item": "validarAtribuicao",
+    "conta": "2P e P1 == P2 → P2 recebe o outro aparelho",
+    "resultado": "nunca dois no mesmo joystick",
+    "porque": "A regra é conferida ao abrir a tela e ao confirmar."
+   },
+   {
+    "item": "escolha → teclas",
+    "conta": "teclaDoJogador: WASD = 1, SETAS = 2, ambos = 3",
+    "resultado": "desconectou: o teclado volta ao dono",
+    "porque": "controleNoJogador pergunta \"está conectado?\" a cada quadro."
+   }
+  ]
+ }
+}

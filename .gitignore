@@ -1,0 +1,21 @@
+build/
+*.exe
+ranking_aula.csv
+ranking_avancado.csv*
+som_aula.wav
+# Baixado do GitHub por baixar_jogo_final.ps1; não faz parte do curso.
+projeto_final/
+ranking_solucao13.csv
+ranking_bak_*.csv*
+teste_ok.wav
+teste_cortado.wav
+ranking_aula32.csv*
+ranking_solucao32.csv*
+controles_aula33.cfg
+
+# Arte duplicada do jogo de referencia; obtida por baixar_jogo_final.ps1.
+assets/
+# Arquivos locais e caches do Python.
+ESTADO_ORIGINAL.md
+__pycache__/
+*.pyc
