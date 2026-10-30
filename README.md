@@ -171,7 +171,7 @@ Os executáveis, arquivos temporários e o jogo baixado são gerados localmente 
 
 ## Código e imagens de terceiros
 
-O jogo final e seus recursos são obtidos do [repositório de referência](https://github.com/diisilva/bomberman-univali-prog-2). Sprites e personagens de jogos pertencem a seus respectivos titulares. As imagens de estudo presentes neste curso devem ter a origem e a permissão de redistribuição conferidas antes de torná-lo público.
+O jogo final e seus recursos são obtidos do [repositório de referência](https://github.com/diisilva/bomberman-univali-prog-2). Sprites e personagens de jogos pertencem a seus respectivos titulares.
 
 ## Próxima ação
 
